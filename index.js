@@ -53,15 +53,19 @@ async function run() {
         })
         //GET API of orders
         app.get('/orders', async (req, res) => {
+            const userEmail = req.query.email;
+            const result = await orderCollection.find({}).toArray();
+            if(userEmail){
+                const newResult = result.filter(order => order.email === userEmail);
+                res.send(newResult);
+            } else {
+                res.send(result);
+            }
 
-            const cursor = orderCollection.find({});
-            orders = await cursor.toArray();
-
-            res.send(orders)
         })
 
-         //get specific order using id
-         app.get('/orders/:id', async (req, res) => {
+        //get specific order using id
+        app.get('/orders/:id', async (req, res) => {
             const id = req.params.id;
 
             const query = { _id: ObjectId(id) };
@@ -73,35 +77,36 @@ async function run() {
 
         //GET My Order
 
-        app.get('/orders', async (req, res) => {
-            const userEmail = req.query.email;
-            console.log(userEmail);
-            const cursor = orderCollection.find({});
-            const result = await cursor.toArray({});
-            if (userEmail) {
-                const newResult = result.filter((myOrder => myOrder.email === userEmail));
-                res.send(newResult);
-            }
-            else {
-                res.send(result);
+        // app.get('/orders', async (req, res) => {
+        //     const userEmail = req.query.email;
+        //     console.log(userEmail);
+        //     const cursor = orderCollection.find({});
+        //     const result = await cursor.toArray({});
+        //     if (userEmail) {
+        //         const newResult = result.filter((myOrder => myOrder.email === userEmail));
+        //         res.send(newResult);
+        //     }
+        //     else {
+        //         res.send(result);
 
-            }
+        //     }
+        // });
 
-            //delete  order api
-            app.delete('/orders/:id', async (req, res) => {
-                const id = req.params.id;
-                console.log(id)
-                const query = { _id: ObjectId(id) };
-                const result = await orderCollection.deleteOne(query);
-                console.log(result);
+        //delete  order api
+        app.delete('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log(id)
+            const query = { _id: ObjectId(id) };
+            const result = await orderCollection.deleteOne(query);
+            console.log(result);
 
-                console.log('deleting', id)
-                res.json(result);
-            });
-
-        })
+            console.log('deleting', id)
+            res.json(result);
+        });
 
     }
+
+
     finally {
         //await client.close(); 
     }

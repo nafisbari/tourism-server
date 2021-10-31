@@ -55,7 +55,7 @@ async function run() {
         app.get('/orders', async (req, res) => {
             const userEmail = req.query.email;
             const result = await orderCollection.find({}).toArray();
-            if(userEmail){
+            if (userEmail) {
                 const newResult = result.filter(order => order.email === userEmail);
                 res.send(newResult);
             } else {
@@ -83,7 +83,7 @@ async function run() {
         //     const cursor = orderCollection.find({});
         //     const result = await cursor.toArray({});
         //     if (userEmail) {
-        //         const newResult = result.filter((myOrder => myOrder.email === userEmail));
+        //         const newResult = result.filter(myOrder => myOrder.email === userEmail);
         //         res.send(newResult);
         //     }
         //     else {
@@ -103,6 +103,21 @@ async function run() {
             console.log('deleting', id)
             res.json(result);
         });
+
+        //update order api
+        app.put('/orders/:id', async (req, res) => {
+            const id = req.params.id;
+            const status = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedStatus = {
+                $set: {
+                    status: status.status,
+                }
+            };
+            const result = await orderCollection.updateOne(filter, updatedStatus, options);
+            res.json(result);
+        })
 
     }
 
